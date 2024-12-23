@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="profile">
+                <img src="https://via.placeholder.com/100" alt="Profile" class="profile-img">
+                <h2>John Doe</h2>
+                <p>User</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active"><i class="fas fa-home"></i> Dashboard</li>
+                    <li><i class="fas fa-user"></i> Profile</li>
+                    <li><i class="fas fa-cog"></i> Settings</li>
+                    <li><i class="fas fa-sign-out-alt"></i> Logout</li>
+                
+                </ul>
+            </nav>
+        </div>
+        
+        <div class="main-content">
+            <header>
+                <h1>Select Your Destination</h1>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+            </header>
+
+            <div class="destination-selection">
+                <form id="destinationForm">
+                    <div class="destination-options">
+                        <div class="destination-card">
+                            <input type="radio" id="mall" name="destination" value="mall">
+                            <label for="mall">
+                                <i class="fas fa-shopping-mall"></i>
+                                <span>Mall</span>
+                            </label>
+                        </div>
+                        
+                        <div class="destination-card">
+                            <input type="radio" id="hotel" name="destination" value="hotel">
+                            <label for="hotel">
+                                <i class="fas fa-hotel"></i>
+                                <span>Hotel</span>
+                            </label>
+                        </div>
+                        
+                        <div class="destination-card">
+                            <input type="radio" id="restaurant" name="destination" value="restaurant">
+                            <label for="restaurant">
+                                <i class="fas fa-utensils"></i>
+                                <span>Restaurant</span>
+                            </label>
+                        </div>
+                        
+                        <div class="destination-card">
+                            <input type="radio" id="bar" name="destination" value="bar">
+                            <label for="bar">
+                                <i class="fas fa-glass-cheers"></i>
+                                <span>Bar</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="proceed-btn">Proceed</button>
+                </form>
+            </div>
+
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="stat-info">
+                        <h3>Total Visits</h3>
+                        <p>256</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <div class="stat-info">
+                        <h3>Favorite Spots</h3>
+                        <p>15</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-ticket-alt"></i>
+                    <div class="stat-info">
+                        <h3>Active Passes</h3>
+                        <p>3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

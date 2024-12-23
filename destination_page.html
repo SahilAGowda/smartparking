@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Destination Details</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #4a90e2;
+        --secondary-color: #7ed6df;
+        --accent-color: #ff6b6b;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding-bottom: 50px;
+      }
+
+      .destination-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        margin-top: 50px;
+      }
+
+      .location-card {
+        background: #ffffff;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 1px solid #eee;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .location-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+      }
+
+      .location-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 15px;
+      }
+
+      .location-card .icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+      }
+
+      .filter-section {
+        margin-bottom: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .filter-btn {
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .filter-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+      }
+
+      .map-container {
+        height: 500px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .rating-stars {
+        color: #ffd700;
+        margin-right: 5px;
+      }
+
+      .price-tag {
+        color: var(--accent-color);
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .amenities-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .amenity-badge {
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .search-bar {
+        margin-bottom: 30px;
+      }
+
+      .search-input {
+        border-radius: 25px;
+        padding: 15px 25px;
+        border: 2px solid #eee;
+        transition: all 0.3s ease;
+      }
+
+      .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.1);
+      }
+
+      .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container destination-container">
+      <div class="row">
+        <div class="col-12">
+          <h1 id="destinationTitle" class="text-center mb-4">
+            Exploring
+            <span id="selectedDestination" class="text-primary"></span>
+          </h1>
+        </div>
+      </div>
+
+      <div class="row search-bar">
+        <div class="col-12">
+          <input
+            type="text"
+            class="form-control search-input"
+            placeholder="Search by name, amenities, or location..."
+          />
+        </div>
+      </div>
+
+      <div class="row filter-section">
+        <div class="col-12">
+          <div class="btn-group" role="group">
+            <button
+              type="button"
+              class="btn btn-outline-primary filter-btn active"
+              data-filter="all"
+            >
+              All
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary filter-btn"
+              data-filter="top-rated"
+            >
+              Top Rated
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary filter-btn"
+              data-filter="price-low"
+            >
+              Lowest Price
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary filter-btn"
+              data-filter="price-high"
+            >
+              Highest Price
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div class="row" id="locationsContainer">
+        <!-- Locations will be dynamically populated here -->
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <div id="mapContainer" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const destination = "Bangalore"; // Static destination
+        document.getElementById("selectedDestination").textContent =
+          destination.toUpperCase();
+        displayStaticLocations(destination);
+        initializeMap();
+
+        // Filter Buttons
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            filterButtons.forEach((btn) => btn.classList.remove("active"));
+            button.classList.add("active");
+            filterLocations(button.dataset.filter);
+          });
+        });
+      });
+
+      function displayStaticLocations(destination) {
+        const staticData = [
+          {
+            name: "Phoenix Marketcity",
+            rating: 4.6,
+            price: "Luxury Shopping",
+            image: "https://via.placeholder.com/300x200",
+            latitude: 12.9961,
+            longitude: 77.6992,
+          },
+          {
+            name: "UB City Mall",
+            rating: 4.7,
+            price: "High-end Shopping",
+            image: "https://via.placeholder.com/300x200",
+            latitude: 12.9716,
+            longitude: 77.5946,
+          },
+          {
+            name: "Orion Mall",
+            rating: 4.5,
+            price: "Premium Shopping",
+            image: "https://via.placeholder.com/300x200",
+            latitude: 13.0122,
+            longitude: 77.5556,
+          },
+          {
+            name: "Forum Mall",
+            rating: 4.4,
+            price: "Mid-range Shopping",
+            image: "https://via.placeholder.com/300x200",
+            latitude: 12.9372,
+            longitude: 77.627,
+          },
+        ];
+
+        displayLocations(staticData);
+        addMarkersToMap(staticData);
+      }
+
+      function displayLocations(locations) {
+        const container = document.getElementById("locationsContainer");
+        container.innerHTML = "";
+
+        locations.forEach((location) => {
+          const card = createLocationCard(location);
+          container.appendChild(card);
+        });
+      }
+
+      function createLocationCard(location) {
+        const col = document.createElement("div");
+        col.className = "col-md-4 mb-4";
+
+        col.innerHTML = `
+        <div class="location-card" onclick="navigateToMallDetails('${
+          location.name
+        }')">
+            <img src="${location.image}" class="location-image" alt="${
+          location.name
+        }">
+            <h4>${location.name}</h4>
+            <div class="rating-stars">
+                ${getStarRating(location.rating)}
+                <span class="text-muted">(${location.rating})</span>
+            </div>
+            <div class="price-tag mt-2">${location.price}</div>
+            <div class="amenities-list">
+                ${getRandomAmenities()
+                  .map(
+                    (amenity) =>
+                      `<span class="amenity-badge"><i class="fas ${amenity.icon}"></i> ${amenity.name}</span>`
+                  )
+                  .join("")}
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary w-100">View Details</button>
+            </div>
+        </div>
+    `;
+
+        return col;
+      }
+
+      function navigateToMallDetails(mallName) {
+        // Encode the mall name to handle special characters in the URL
+        const encodedMallName = encodeURIComponent(mallName);
+        window.location.href = `mall-details.html?mall=${encodedMallName}`;
+      }
+
+      function getStarRating(rating) {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let stars = "";
+
+        for (let i = 0; i < fullStars; i++) {
+          stars += '<i class="fas fa-star"></i>';
+        }
+        if (hasHalfStar) {
+          stars += '<i class="fas fa-star-half-alt"></i>';
+        }
+
+        return stars;
+      }
+
+      function getRandomAmenities() {
+        const amenities = [
+          { name: "WiFi", icon: "fa-wifi" },
+          { name: "Parking", icon: "fa-parking" },
+          { name: "Restaurants", icon: "fa-utensils" },
+          { name: "Theater", icon: "fa-film" },
+        ];
+
+        return amenities.sort(() => 0.5 - Math.random()).slice(0, 3);
+      }
+
+      function initializeMap() {
+        const mapOptions = {
+          zoom: 12,
+          center: { lat: 12.9716, lng: 77.5946 }, // Bangalore's latitude and longitude
+          styles: [
+            {
+              featureType: "poi",
+              elementType: "labels.text.fill",
+              stylers: [{ color: "#747474" }],
+            },
+            {
+              featureType: "poi.park",
+              elementType: "geometry.fill",
+              stylers: [{ color: "#e6f3d6" }],
+            },
+            {
+              featureType: "water",
+              elementType: "geometry.fill",
+              stylers: [{ color: "#a2daf2" }],
+            },
+          ],
+        };
+
+        map = new google.maps.Map(
+          document.getElementById("mapContainer"),
+          mapOptions
+        );
+      }
+
+      function addMarkersToMap(locations) {
+        markers.forEach((marker) => marker.setMap(null));
+        markers = [];
+
+        locations.forEach((location) => {
+          const marker = new google.maps.Marker({
+            position: { lat: location.latitude, lng: location.longitude },
+            map: map,
+            title: location.name,
+            animation: google.maps.Animation.DROP,
+          });
+
+          const infowindow = new google.maps.InfoWindow({
+            content: `
+                        <div style="padding: 10px;">
+                            <h5>${location.name}</h5>
+                            <p>Rating: ${location.rating}⭐</p>
+                            <p>${location.price}</p>
+                        </div>
+                    `,
+          });
+
+          marker.addListener("click", () => {
+            infowindow.open(map, marker);
+          });
+
+          markers.push(marker);
+        });
+
+        if (locations.length > 0) {
+          map.setCenter({
+            lat: locations[0].latitude,
+            lng: locations[0].longitude,
+          });
+        }
+      }
+    </script>
+
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initializeMap"
+    ></script>
+
+    <script>
+      // Add destination type specific data and functionality
+      const destinationTypes = {
+        mall: {
+          zoom: 14,
+          icon: "shopping-cart",
+          amenities: [
+            { name: "Parking", icon: "fa-parking" },
+            { name: "Food Court", icon: "fa-utensils" },
+            { name: "WiFi", icon: "fa-wifi" },
+            { name: "ATM", icon: "fa-money-bill" },
+            { name: "Cinema", icon: "fa-film" },
+          ],
+        },
+        hotel: {
+          zoom: 15,
+          icon: "hotel",
+          amenities: [
+            { name: "WiFi", icon: "fa-wifi" },
+            { name: "Pool", icon: "fa-swimming-pool" },
+            { name: "Spa", icon: "fa-spa" },
+            { name: "Restaurant", icon: "fa-utensils" },
+            { name: "Gym", icon: "fa-dumbbell" },
+            { name: "Parking", icon: "fa-parking" },
+          ],
+        },
+        restaurant: {
+          zoom: 15,
+          icon: "utensils",
+          amenities: [
+            { name: "Takeout", icon: "fa-shopping-bag" },
+            { name: "Delivery", icon: "fa-motorcycle" },
+            { name: "Reservations", icon: "fa-calendar-check" },
+            { name: "Bar", icon: "fa-glass-martini" },
+            { name: "Outdoor Seating", icon: "fa-umbrella" },
+          ],
+        },
+        bar: {
+          zoom: 15,
+          icon: "glass-martini",
+          amenities: [
+            { name: "Happy Hour", icon: "fa-clock" },
+            { name: "Live Music", icon: "fa-music" },
+            { name: "Food Menu", icon: "fa-utensils" },
+            { name: "Outdoor Seating", icon: "fa-umbrella" },
+            { name: "Sports TV", icon: "fa-tv" },
+          ],
+        },
+      };
+
+      function filterLocations(filter) {
+        const cards = document.querySelectorAll(".location-card");
+
+        cards.forEach((card) => {
+          const rating = parseFloat(
+            card
+              .querySelector(".rating-stars .text-muted")
+              .textContent.replace("(", "")
+              .replace(")", "")
+          );
+          const price = parseInt(
+            card.querySelector(".price-tag").textContent.replace("$", "")
+          );
+
+          switch (filter) {
+            case "top-rated":
+              card.closest(".col-md-4").style.display =
+                rating >= 4.5 ? "block" : "none";
+              break;
+            case "price-low":
+              const sortedByPrice = Array.from(cards).sort((a, b) => {
+                const priceA = parseInt(
+                  a.querySelector(".price-tag").textContent.replace("$", "")
+                );
+                const priceB = parseInt(
+                  b.querySelector(".price-tag").textContent.replace("$", "")
+                );
+                return priceA - priceB;
+              });
+              sortedByPrice.forEach((sortedCard, index) => {
+                const parent = document.getElementById("locationsContainer");
+                parent.appendChild(sortedCard.closest(".col-md-4"));
+              });
+              break;
+            case "price-high":
+              const sortedByPriceDesc = Array.from(cards).sort((a, b) => {
+                const priceA = parseInt(
+                  a.querySelector(".price-tag").textContent.replace("$", "")
+                );
+                const priceB = parseInt(
+                  b.querySelector(".price-tag").textContent.replace("$", "")
+                );
+                return priceB - priceA;
+              });
+              sortedByPriceDesc.forEach((sortedCard, index) => {
+                const parent = document.getElementById("locationsContainer");
+                parent.appendChild(sortedCard.closest(".col-md-4"));
+              });
+              break;
+            default:
+              card.closest(".col-md-4").style.display = "block";
+              break;
+          }
+        });
+      }
+
+      async function getPlaceDetails(placeName) {
+        try {
+          const response = await fetch(
+            `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+              placeName
+            )}&inputtype=textquery&fields=formatted_address,name,rating,geometry,photos&key=${GOOGLE_MAPS_API_KEY}`
+          );
+          const data = await response.json();
+          return data.candidates[0];
+        } catch (error) {
+          console.error("Error fetching place details:", error);
+          return null;
+        }
+      }
+
+      async function enrichLocationData(location) {
+        const placeDetails = await getPlaceDetails(location.name);
+        if (placeDetails) {
+          return {
+            ...location,
+            address: placeDetails.formatted_address,
+            latitude: placeDetails.geometry?.location.lat,
+            longitude: placeDetails.geometry?.location.lng,
+            rating: placeDetails.rating || location.rating,
+            image: placeDetails.photos?.[0]?.photo_reference
+              ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${placeDetails.photos[0].photo_reference}&key=${GOOGLE_MAPS_API_KEY}`
+              : location.image,
+          };
+        }
+        return location;
+      }
+
+      // Add smooth scrolling to map when clicking on a location card
+      document.addEventListener("click", function (e) {
+        if (e.target.closest(".location-card")) {
+          const mapContainer = document.getElementById("mapContainer");
+          mapContainer.scrollIntoView({ behavior: "smooth" });
+
+          // Highlight corresponding marker
+          const locationName = e.target
+            .closest(".location-card")
+            .querySelector("h4").textContent;
+          const marker = markers.find((m) => m.getTitle() === locationName);
+          if (marker) {
+            new google.maps.event.trigger(marker, "click");
+            map.panTo(marker.getPosition());
+          }
+        }
+      });
+
+      // Handle browser back/forward buttons
+      window.addEventListener("popstate", function (event) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const destination = urlParams.get("destination");
+        if (destination) {
+          document.getElementById("selectedDestination").textContent =
+            destination.toUpperCase();
+          fetchAndDisplayLocations(destination);
+        }
+      });
+    </script>
+  </body>
+</html>
