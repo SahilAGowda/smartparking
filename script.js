@@ -5,7 +5,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     const password = document.getElementById('password').value;
     const message = document.getElementById('message');
 
-    if (username === 'sahil' && password === '1234') {
+    if (username === 'praveen' && password === '1234') {
         message.style.color = 'green';
         message.textContent = 'Login successful!';
         setTimeout(() => {
